@@ -19,6 +19,56 @@
 		7 - Neděle
 */
 
+/*
+	Databáze "databaze"
+		Relace "denni_cteni"
+			"id" - int
+				[primární klíč]
+			"den" - int
+				[den po Pasše]
+			"adresa" - string
+			"text" - string
+			"bible" - int
+				[překlad Bible]
+				0 - Bible Kralická (1613)
+				1 - ČEP
+				2 - Bible 21 (Nová Bible Kralická)
+				3 - Překlad Petrů
+			"cas" - int
+				[denní doba]
+				0 - jitřní
+				1 - liturgie
+				2 - nedefinováno
+			"typ" - int
+				0 - apoštol
+				1 - evangelista
+		Relace "jmena_nedeli"
+			"id" - int
+			"nazev" - string
+		Relace "tz"
+			"id" - int
+			"text" - string
+	
+	
+	Zvýšení maximální kapacity stringu
+		ALTER TABLE table MODIFY COLUMN column VARCHAR (délka) NOT NULL
+*/
+
+/*
+	Týdnování
+		Pascha je v neděli. Týden následující pondělím po Pasše se nazývá "Světlý týden"
+		a trvá do soboty včetně. Následující neděle, která je první nedělí po Pasše se
+		nazývá "Druhá neděle po Pasše" a v ní, jako v prvním dni začíná panovat první hlas.
+		Také jí začíná druhý týden po Pasše, který končí nejbližší sobotou. Následující
+		neděle, která je druhou nedělí po Pasše se nazývá "Třetí neděle po Pasše" a s ní
+		začíná třetí týden po Pasše. Tento pořádek trvá až do sedmého týdne po Pasše.
+		Následující neděle, která je sedmou nedělí po Pasše a měla by být nazvána osmou
+		nedělí po Pasše se nazývá "Padesátnice". Následujícím pondělím začíná "První týden
+		po Padesátnici", který končí nedělí, která by byla nazvána devátá neděle po Pasše,
+		ale nazývá se "První neděle po Padesátnici". Následujícím pondělím začíná "Druhý
+		týden po Padesátnici. Tento pořádek se již nemění.
+*/
+
 
 class Datum {
 	function Datum() {
@@ -159,6 +209,9 @@ class Den {
 		echo "DPP: ", $this->dpp, "<br>";
 		echo "<br><br>";
 		
+		// Životy svatých
+		echo "Životy svatých na dnešní den z Ochridského prologu <a href='/op/$this->s_den.pdf' target='_blank'>zde</a>.<br><br>";
+		
 		//Denní čtení
 		$this->vypsat_cteni();
 		
@@ -298,41 +351,6 @@ function porovnej($prvni, $druhy) {
 	}
 }
 
-/*
-	Databáze "databaze"
-		Relace "denni_cteni"
-			"id" - int
-				[primární klíč]
-			"den" - int
-				[den po Pasše]
-			"adresa" - string
-			"text" - string
-			"bible" - int
-				[překlad Bible]
-				0 - Bible Kralická (1613)
-				1 - ČEP
-				2 - Bible 21 (Nová Bible Kralická)
-				3 - Překlad Petrů
-			"cas" - int
-				[denní doba]
-				0 - jitřní
-				1 - liturgie
-				2 - nedefinováno
-			"typ" - int
-				0 - apoštol
-				1 - evangelista
-		Relace "jmena_nedeli"
-			"id" - int
-			"nazev" - string
-		Relace "tz"
-			"id" - int
-			"text" - string
-	
-	
-	Zvýšení maximální kapacity stringu
-		ALTER TABLE table MODIFY COLUMN column VARCHAR (délka) NOT NULL
-
-*/
 
 class Dtb {
 	function Dtb() {
