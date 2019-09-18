@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Počítač: 127.0.0.1
--- Vytvořeno: Úte 17. zář 2019, 22:43
+-- Vytvořeno: Stř 18. zář 2019, 22:14
 -- Verze serveru: 10.4.6-MariaDB
 -- Verze PHP: 7.3.9
 
@@ -25,31 +25,60 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktura tabulky `denni_cteni`
+-- Struktura tabulky `denni_cteni_k`
 --
 
-CREATE TABLE `denni_cteni` (
+CREATE TABLE `denni_cteni_k` (
+  `id` int(11) NOT NULL,
+  `den` int(11) NOT NULL,
+  `mesic` int(11) NOT NULL,
+  `adresa` varchar(30) NOT NULL,
+  `text` varchar(1500) NOT NULL,
+  `bible` int(11) NOT NULL,
+  `cas` int(11) NOT NULL,
+  `typ` int(11) NOT NULL,
+  `zacalo` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Vypisuji data pro tabulku `denni_cteni_k`
+--
+
+INSERT INTO `denni_cteni_k` (`id`, `den`, `mesic`, `adresa`, `text`, `bible`, `cas`, `typ`, `zacalo`) VALUES
+(1, 5, 9, 'Žid VI, 13-20.', '13Když totiž Bůh dával zaslíbení Abrahamovi, neměl, při kom větším by přísahal, a tak přísahal sám při sobě:\\r\\n14„Jistě ti nesmírně požehnám\\r\\na nesmírně tě rozmnožím.“\\r\\n\\r\\n15Abraham pak díky trpělivosti dosáhl zaslíbení.\\r\\n16Lidé vždy přísahají při někom vyšším a přísaha je pro ně potvrzením, o němž nemůže být spor. 17Bůh ovšem chtěl dědicům zaslíbení přesvědčivě ukázat nezvratnost svého rozhodnutí, a tak svůj slib stvrdil přísahou. 18A protože je nemožné, aby Bůh lhal, stávají se tyto dvě nezvratné věci mocným povzbuzením pro nás, kdo jsme našli útočiště v nabídnuté naději.\\r\\n19Tuto naději máme jako kotvu duše, bezpečnou, pevnou a sahající až dovnitř za oponu, 20kam za nás vstoupil náš předchůdce Ježíš, který se na věky stal veleknězem podle Melchisedechova řádu.', 2, 3, 0, 314),
+(2, 5, 9, 'Mat. XXIII, 29-39.', '28(29)Běda vám, znalci Písma a farizeové! Pokrytci, stavíte hroby prorokům, zdobíte náhrobky spravedlivých 29a(30) říkáte: ‚Kdybychom žili za dnů našich otců, neprolévali bychom s nimi krev proroků.‘ 30(31)Tím sami sebe usvědčujete jako syny těch, kdo vraždili proroky. 31(32)Dovršte tedy dílo svých otců! 32(33)Hadi! Plemeno zmijí! Jak byste mohli uniknout pekelnému trestu?\r\n33(34)Pohleďte, proto k vám posílám proroky, mudrce a učitele Písma. Vy některé zabijete a ukřižujete, jiné budete bičovat ve svých shromážděních a pronásledovat je od města k městu. 34(35)Tak na vás padne veškerá spravedlivá krev prolitá na zemi – od krve spravedlivého Ábela až po krev Zachariáše, syna Berechiášova, kterého jste zavraždili mezi svatyní a oltářem. 35(36)Amen, říkám vám, že to všechno padne na toto pokolení!\r\n36(37)Jeruzaléme, Jeruzaléme, který zabíjíš proroky a kamenuješ ty, kdo jsou k tobě posíláni! Kolikrát jsem chtěl shromáždit tvé děti, jako slepice shromažďuje svá kuřata pod křídla, ale nechtěli jste. 37(38)Hle, váš dům vám teď zůstane pustý. 38(39)Říkám vám, že od této chvíle mě neuvidíte, dokud neřeknete: ‚Požehnaný, jenž přichází v Hospodinově jménu!‘“', 2, 3, 1, 96);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabulky `denni_cteni_p`
+--
+
+CREATE TABLE `denni_cteni_p` (
   `id` int(11) NOT NULL,
   `den` int(11) DEFAULT NULL,
   `adresa` varchar(30) DEFAULT NULL,
   `text` varchar(1500) NOT NULL,
   `bible` int(11) DEFAULT NULL,
   `cas` int(11) DEFAULT NULL,
-  `typ` int(11) DEFAULT NULL
+  `typ` int(11) DEFAULT NULL,
+  `zacalo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Vypisuji data pro tabulku `denni_cteni`
+-- Vypisuji data pro tabulku `denni_cteni_p`
 --
 
-INSERT INTO `denni_cteni` (`id`, `den`, `adresa`, `text`, `bible`, `cas`, `typ`) VALUES
-(1, 140, '1. Kor. XVI, 13-24.', '13Bděte, stůjte ve víře, buďte stateční, buďte silní. 14Všechno ať se mezi vámi děje v lásce.\r\n15Bratři, víte, že Štěpánova rodina je prvním ovocem Řecka a že se vydali službě svatým. Prosím vás tedy, 16abyste takové lidi následovali, a stejně tak i každého, kdo se podílí na tomto díle. 17Mám velikou radost, že dorazil Štěpán, Fortunát a Achaikos, protože mi vynahradili vaši nepřítomnost. 18Občerstvili mě na duchu a jistě i vás. Takových lidí si važte.\r\n19Pozdravují vás sbory v Asii. Velmi vás v Pánu pozdravuje Akvila s Priscillou i církev u nich v domě. 20Pozdravují vás všichni sourozenci. Pozdravte se navzájem svatým polibkem.\r\n21JÁ PAVEL PŘIDÁVÁM POZDRAV SVOU VLASTNÍ RUKOU.\r\n22Kdo nemá rád Pána, ať je proklet. Maranatha!\r\n23Milost Pána Ježíše s vámi.\r\n24Má láska je s vámi všemi v Kristu Ježíši.', 2, 1, 0),
-(2, 140, 'Mat. XXI, 33-42.', '33„Poslechněte si další podobenství: Jeden hospodář vysadil vinici, obehnal ji plotem, vykopal v ní lis a postavil věž. Pak ji pronajal vinařům a vydal se na cestu. 34Když se přiblížil čas vinobraní, poslal k vinařům své služebníky, aby převzali její úrodu. 35Vinaři se těch služebníků chopili a jednoho ztloukli, jiného zabili a dalšího kamenovali. 36Poslal tedy ještě jiné služebníky, více než předtím, a těm udělali totéž.\r\n37Nakonec k nim poslal svého syna. Řekl si: ‚Před mým synem se zastydí.‘ 38Když ale vinaři toho syna uviděli, řekli si: ‚Tohle je dědic. Pojďme ho zabít a zmocnit se dědictví!‘ 39Chopili se ho, vyvlekli z vinice ven a zabili. 40Co tedy pán vinice udělá s oněmi vinaři, až přijde?“\r\n41Odpověděli mu: „Ty zlosyny zle zahubí a vinici pronajme jiným vinařům, kteří mu budou odevzdávat ovoce v čas sklizně.“\r\n42Ježíš jim řekl: „Nikdy jste nečetli v Písmech?\r\n‚Kámen staviteli zavržený\r\nstal se kamenem úhelným.\r\nSám Hospodin to učinil\r\na v našich očích je to div.‘', 2, 1, 1),
-(3, 140, 'Mar. XVI, 1-8.', '1Když skončila sobota, Marie Magdaléna, Marie Jakubova a Salome nakoupily vonné masti, aby mohly jít a pomazat Ježíše. 2Za svítání prvního dne v týdnu, jakmile vyšlo slunce, šly k hrobu. 3Říkaly si: „Kdo nám odvalí kámen od vchodu?“\r\n4Když ale vzhlédly, spatřily, že kámen je odvalen (přestože byl velmi veliký). 5Vešly do hrobu, a když vpravo uviděly sedět mladíka oblečeného bílým rouchem, hrozně se vylekaly.\r\n6On jim však řekl: „Nelekejte se. Hledáte ukřižovaného Ježíše z Nazaretu. Vstal, není tu. Podívejte se, kam ho položili. 7Jděte a řekněte jeho učedníkům i Petrovi, že vás předchází do Galileje. Tam ho spatříte, jak vám řekl.“\r\n8A tak vyšly ven a utekly od hrobu strachy bez sebe. A nikomu nic neřekly, protože se bály.', 2, 0, 1),
-(4, 141, '2. Kor. XII, 10-19.', '10S radostí snáším slabosti, příkoří, strádání, pronásledování a úzkosti pro Krista – vždyť má síla je v mé slabosti!\r\nZáleží mi na vás\r\n11Dělám tu ze sebe blázna, ale vy jste mě k tomu donutili. Mohli jste mě přece chválit sami – i když nic neznamenám, s těmi veleapoštoly si v ničem nezadám. 12Důkazů o mém apoštolství jste dostali dost. Vzpomeňte na všechno, co jsem vydržel, na všechna znamení, divy a zázraky. 13O co jste přišli oproti jiným církvím? Jen o to, že jsem vám nebyl na obtíž – odpusťte mi tu křivdu!\r\n14Právě se k vám chystám už potřetí a ani tentokrát vám nebudu na obtíž. Nestojím o vaše peníze, ale o vás! Děti přece nemají vydržovat rodiče, ale rodiče děti. 15Pokud jde o mě, milerád se vydám z posledního, i sám sebe vydám za vaše životy, i když čím více vás miluji, tím méně jsem milován.\r\n16Budiž, nikdy jsem vás nezatěžoval. Jako chytrák jsem vás prý ale obelstil! 17Jak asi? Podvedl jsem vás skrze někoho, koho jsem k vám poslal? 18Požádal jsem o pomoc Tita a poslal jsem s ním jednoho bratra. Že by vás podvedl Titus? Nejednali jsme ve stejném duchu? Nešli jsme ve stejných šlépějích?\r\n19Myslíte, že se před vámi celou dobu hájíme? Milovaní, my mluvíme před Boží tváří v Kristu, a to všechno pro vaši posilu.', 2, 2, 0),
-(6, 141, 'Mar. IV, 10-23.', '10Jakmile byl o samotě, ti, kdo byli s ním, se ho spolu s Dvanácti ptali na ta podobenství. 11„Vám je svěřeno tajemství Božího království,“ odpověděl jim, „ale těm, kdo jsou vně, se to všechno děje v podobenstvích, 12aby\r\n‚hleděli a hleděli, ale nechápali,\r\nposlouchali a slyšeli, ale nerozuměli,\r\naby se snad neobrátili\r\na nebylo jim odpuštěno.‘“\r\n\r\n13Tehdy jim řekl: „Vy to podobenství nechápete? A jak porozumíte všem ostatním podobenstvím? 14Rozsévač rozsévá Slovo. 15Ti, kterým se rozsévá Slovo podél cesty, jsou tito: Jakmile uslyší, ihned přichází satan a bere Slovo, které do nich bylo zaseto. 16Ti, kterým se seje na skalnatou půdu, jsou pak tito: Jakmile uslyší Slovo, hned je s radostí přijímají, 17ale nemají v sobě kořen a jsou nestálí. Když potom kvůli Slovu nastane soužení nebo pronásledování, hned odpadají. 18Další jsou ti, kterým se seje do trní: To jsou ti, kteří slyší Slovo, 19ale pak přicházejí starosti tohoto světa, oklamání bohatstvím a chtivost po dalších věcech a dusí Slovo, takže se stává neplodným. 20A pak jsou ti, u kterých se seje na dobré půdě: Slyší Slovo, přijímají je a přinášejí úrodu – jeden třicetinásobnou, jiný šedesátinásobnou a jiný stonásobnou.“\r\nJiná podobenství o Království\r\n21Dále jim řekl: „Přináší se snad lampa, aby ji postavili pod vědro nebo pod postel? Nemá se postavit na svícen? 22Není totiž nic skrytého, co by nemělo být zjeveno, ani nic tak utajeného, aby to nevyšlo najevo. 23Má-li kdo uši k slyšení, slyš!“', 2, 2, 1),
-(7, 142, '2. Kor. XII, 20-XIII, 2.', '20Bojím se totiž, abych z vás, až přijdu, nebyl zklamaný a také vy abyste nebyli zklamaní ze mě. Bojím se svárů, nevraživosti, zloby, soupeření, urážek, pomluv, zpupnosti a zmatků. 21Bojím se, aby mě můj Bůh, až přijdu, před vámi znovu neponížil, kdybych musel truchlit nad tolika dřívějšími hříšníky, kteří nečinili pokání z nečistoty, smilstva a nestydatosti, kterou páchali.\r\n13\r\nSpějte k dokonalosti\r\n1Toto bude má třetí návštěva u vás. „Každé slovo potvrdí výpověď dvou nebo tří svědků.“ 2Co jsem řekl, když jsem byl u vás podruhé, to teď opakuji, když jsem pryč: Až se k vám vrátím, nebudu brát ohled na ty, kdo zůstali v hříchu, ani na nikoho jiného.', 2, 2, 0),
-(8, 142, 'Mar. IV, 24-34.', '24Řekl jim také: „Dávejte pozor na to, co posloucháte. Jakou mírou měříte, takovou vám bude odměřeno a ještě vám bude přidáno. 25Tomu, kdo má, bude dáno, ale tomu, kdo nemá, bude vzato i to, co má.“\r\n26Potom řekl: „Boží království působí, jako když člověk hodí zrno na zem. 27Spí a vstává ve dne i v noci a to zrno klíčí a roste, a on ani neví jak. 28Země totiž plodí úrodu sama od sebe – nejdříve stéblo, potom klas a potom zralé obilí v klasu. 29A když úroda dozraje, ihned se chopí srpu, protože nastala žeň.“\r\n30Řekl také: „K čemu přirovnáme Boží království? Jakým podobenstvím ho představíme? 31Je jako zrnko hořčice, které když je zaseto do země, je nejmenší ze všech semen na zemi. 32Jakmile je však zaseto, roste, až je větší než všechny byliny, a vypouští mohutné větve, takže i ptáci mohou hnízdit v jeho stínu.“\r\n33Přinášel jim Slovo v mnoha takových podobenstvích, nakolik byli schopni rozumět. 34Nemluvil k nim jinak než v podobenstvích, ale svým učedníkům všechno v soukromí vysvětloval.', 2, 2, 1);
+INSERT INTO `denni_cteni_p` (`id`, `den`, `adresa`, `text`, `bible`, `cas`, `typ`, `zacalo`) VALUES
+(1, 140, '1. Kor. XVI, 13-24.', '13Bděte, stůjte ve víře, buďte stateční, buďte silní. 14Všechno ať se mezi vámi děje v lásce.\r\n15Bratři, víte, že Štěpánova rodina je prvním ovocem Řecka a že se vydali službě svatým. Prosím vás tedy, 16abyste takové lidi následovali, a stejně tak i každého, kdo se podílí na tomto díle. 17Mám velikou radost, že dorazil Štěpán, Fortunát a Achaikos, protože mi vynahradili vaši nepřítomnost. 18Občerstvili mě na duchu a jistě i vás. Takových lidí si važte.\r\n19Pozdravují vás sbory v Asii. Velmi vás v Pánu pozdravuje Akvila s Priscillou i církev u nich v domě. 20Pozdravují vás všichni sourozenci. Pozdravte se navzájem svatým polibkem.\r\n21JÁ PAVEL PŘIDÁVÁM POZDRAV SVOU VLASTNÍ RUKOU.\r\n22Kdo nemá rád Pána, ať je proklet. Maranatha!\r\n23Milost Pána Ježíše s vámi.\r\n24Má láska je s vámi všemi v Kristu Ježíši.', 2, 1, 0, 166),
+(2, 140, 'Mat. XXI, 33-42.', '33„Poslechněte si další podobenství: Jeden hospodář vysadil vinici, obehnal ji plotem, vykopal v ní lis a postavil věž. Pak ji pronajal vinařům a vydal se na cestu. 34Když se přiblížil čas vinobraní, poslal k vinařům své služebníky, aby převzali její úrodu. 35Vinaři se těch služebníků chopili a jednoho ztloukli, jiného zabili a dalšího kamenovali. 36Poslal tedy ještě jiné služebníky, více než předtím, a těm udělali totéž.\r\n37Nakonec k nim poslal svého syna. Řekl si: ‚Před mým synem se zastydí.‘ 38Když ale vinaři toho syna uviděli, řekli si: ‚Tohle je dědic. Pojďme ho zabít a zmocnit se dědictví!‘ 39Chopili se ho, vyvlekli z vinice ven a zabili. 40Co tedy pán vinice udělá s oněmi vinaři, až přijde?“\r\n41Odpověděli mu: „Ty zlosyny zle zahubí a vinici pronajme jiným vinařům, kteří mu budou odevzdávat ovoce v čas sklizně.“\r\n42Ježíš jim řekl: „Nikdy jste nečetli v Písmech?\r\n‚Kámen staviteli zavržený\r\nstal se kamenem úhelným.\r\nSám Hospodin to učinil\r\na v našich očích je to div.‘', 2, 1, 1, 87),
+(3, 140, 'Mar. XVI, 1-8.', '1Když skončila sobota, Marie Magdaléna, Marie Jakubova a Salome nakoupily vonné masti, aby mohly jít a pomazat Ježíše. 2Za svítání prvního dne v týdnu, jakmile vyšlo slunce, šly k hrobu. 3Říkaly si: „Kdo nám odvalí kámen od vchodu?“\r\n4Když ale vzhlédly, spatřily, že kámen je odvalen (přestože byl velmi veliký). 5Vešly do hrobu, a když vpravo uviděly sedět mladíka oblečeného bílým rouchem, hrozně se vylekaly.\r\n6On jim však řekl: „Nelekejte se. Hledáte ukřižovaného Ježíše z Nazaretu. Vstal, není tu. Podívejte se, kam ho položili. 7Jděte a řekněte jeho učedníkům i Petrovi, že vás předchází do Galileje. Tam ho spatříte, jak vám řekl.“\r\n8A tak vyšly ven a utekly od hrobu strachy bez sebe. A nikomu nic neřekly, protože se bály.', 2, 0, 1, 70),
+(4, 141, '2. Kor. XII, 10-19.', '10S radostí snáším slabosti, příkoří, strádání, pronásledování a úzkosti pro Krista – vždyť má síla je v mé slabosti!\r\nZáleží mi na vás\r\n11Dělám tu ze sebe blázna, ale vy jste mě k tomu donutili. Mohli jste mě přece chválit sami – i když nic neznamenám, s těmi veleapoštoly si v ničem nezadám. 12Důkazů o mém apoštolství jste dostali dost. Vzpomeňte na všechno, co jsem vydržel, na všechna znamení, divy a zázraky. 13O co jste přišli oproti jiným církvím? Jen o to, že jsem vám nebyl na obtíž – odpusťte mi tu křivdu!\r\n14Právě se k vám chystám už potřetí a ani tentokrát vám nebudu na obtíž. Nestojím o vaše peníze, ale o vás! Děti přece nemají vydržovat rodiče, ale rodiče děti. 15Pokud jde o mě, milerád se vydám z posledního, i sám sebe vydám za vaše životy, i když čím více vás miluji, tím méně jsem milován.\r\n16Budiž, nikdy jsem vás nezatěžoval. Jako chytrák jsem vás prý ale obelstil! 17Jak asi? Podvedl jsem vás skrze někoho, koho jsem k vám poslal? 18Požádal jsem o pomoc Tita a poslal jsem s ním jednoho bratra. Že by vás podvedl Titus? Nejednali jsme ve stejném duchu? Nešli jsme ve stejných šlépějích?\r\n19Myslíte, že se před vámi celou dobu hájíme? Milovaní, my mluvíme před Boží tváří v Kristu, a to všechno pro vaši posilu.', 2, 2, 0, 195),
+(6, 141, 'Mar. IV, 10-23.', '10Jakmile byl o samotě, ti, kdo byli s ním, se ho spolu s Dvanácti ptali na ta podobenství. 11„Vám je svěřeno tajemství Božího království,“ odpověděl jim, „ale těm, kdo jsou vně, se to všechno děje v podobenstvích, 12aby\r\n‚hleděli a hleděli, ale nechápali,\r\nposlouchali a slyšeli, ale nerozuměli,\r\naby se snad neobrátili\r\na nebylo jim odpuštěno.‘“\r\n\r\n13Tehdy jim řekl: „Vy to podobenství nechápete? A jak porozumíte všem ostatním podobenstvím? 14Rozsévač rozsévá Slovo. 15Ti, kterým se rozsévá Slovo podél cesty, jsou tito: Jakmile uslyší, ihned přichází satan a bere Slovo, které do nich bylo zaseto. 16Ti, kterým se seje na skalnatou půdu, jsou pak tito: Jakmile uslyší Slovo, hned je s radostí přijímají, 17ale nemají v sobě kořen a jsou nestálí. Když potom kvůli Slovu nastane soužení nebo pronásledování, hned odpadají. 18Další jsou ti, kterým se seje do trní: To jsou ti, kteří slyší Slovo, 19ale pak přicházejí starosti tohoto světa, oklamání bohatstvím a chtivost po dalších věcech a dusí Slovo, takže se stává neplodným. 20A pak jsou ti, u kterých se seje na dobré půdě: Slyší Slovo, přijímají je a přinášejí úrodu – jeden třicetinásobnou, jiný šedesátinásobnou a jiný stonásobnou.“\r\nJiná podobenství o Království\r\n21Dále jim řekl: „Přináší se snad lampa, aby ji postavili pod vědro nebo pod postel? Nemá se postavit na svícen? 22Není totiž nic skrytého, co by nemělo být zjeveno, ani nic tak utajeného, aby to nevyšlo najevo. 23Má-li kdo uši k slyšení, slyš!“', 2, 2, 1, 16),
+(7, 142, '2. Kor. XII, 20-XIII, 2.', '20Bojím se totiž, abych z vás, až přijdu, nebyl zklamaný a také vy abyste nebyli zklamaní ze mě. Bojím se svárů, nevraživosti, zloby, soupeření, urážek, pomluv, zpupnosti a zmatků. 21Bojím se, aby mě můj Bůh, až přijdu, před vámi znovu neponížil, kdybych musel truchlit nad tolika dřívějšími hříšníky, kteří nečinili pokání z nečistoty, smilstva a nestydatosti, kterou páchali.\r\n13\r\nSpějte k dokonalosti\r\n1Toto bude má třetí návštěva u vás. „Každé slovo potvrdí výpověď dvou nebo tří svědků.“ 2Co jsem řekl, když jsem byl u vás podruhé, to teď opakuji, když jsem pryč: Až se k vám vrátím, nebudu brát ohled na ty, kdo zůstali v hříchu, ani na nikoho jiného.', 2, 2, 0, 196),
+(8, 142, 'Mar. IV, 24-34.', '24Řekl jim také: „Dávejte pozor na to, co posloucháte. Jakou mírou měříte, takovou vám bude odměřeno a ještě vám bude přidáno. 25Tomu, kdo má, bude dáno, ale tomu, kdo nemá, bude vzato i to, co má.“\r\n26Potom řekl: „Boží království působí, jako když člověk hodí zrno na zem. 27Spí a vstává ve dne i v noci a to zrno klíčí a roste, a on ani neví jak. 28Země totiž plodí úrodu sama od sebe – nejdříve stéblo, potom klas a potom zralé obilí v klasu. 29A když úroda dozraje, ihned se chopí srpu, protože nastala žeň.“\r\n30Řekl také: „K čemu přirovnáme Boží království? Jakým podobenstvím ho představíme? 31Je jako zrnko hořčice, které když je zaseto do země, je nejmenší ze všech semen na zemi. 32Jakmile je však zaseto, roste, až je větší než všechny byliny, a vypouští mohutné větve, takže i ptáci mohou hnízdit v jeho stínu.“\r\n33Přinášel jim Slovo v mnoha takových podobenstvích, nakolik byli schopni rozumět. 34Nemluvil k nim jinak než v podobenstvích, ale svým učedníkům všechno v soukromí vysvětloval.', 2, 2, 1, 17),
+(9, 143, '2. Kor. XIII, 3-13.', '3Žádáte přece důkaz, že ve mně mluví Kristus. Ten vůči vám není slabý – naopak je mezi vámi mocný! 4Byl sice ukřižován jako slabý, ale teď žije Boží mocí; i my jsme v něm slabí, ale pro vás s ním budeme žít Boží mocí.\r\n5Sami sebe prověřujte, přesvědčujte se, zda jste sami ve víře. Nepoznáváte sami na sobě, že je ve vás Ježíš Kristus? Pokud ne, pak jste ovšem selhali. 6Doufám, že poznáte, že my jsme neselhali.\r\n7Modlím se k Bohu, abyste se nezachovali špatně. Nejde mi o to, aby se ukázal náš vlastní úspěch – budu raději, když se budete chovat správně a my budeme jako ti, kdo selhali. 8Nemůžeme přece stát proti pravdě, jedině za pravdou. 9Rádi budeme slabí, jen když vy budete silní; proto se modlíme za vaši nápravu. 10Toto vám píšu, zatímco jsem pryč, abych až budu u vás, nemusel přísně užít té pravomoci, kterou mi Pán dal k budování, a ne k boření.\r\n11Závěrem, bratři, buďte zdrávi. Spějte k dokonalosti, povzbuzujte se, buďte svorní, žijte v pokoji, a Bůh lásky a pokoje bude s vámi.\r\n12(12a)Pozdravte se navzájem svatým polibkem. 13(12b)Pozdravují vás všichni svatí. 14(13)Milost Pána Ježíše Krista, Boží láska a společenství Ducha svatého s vámi všemi.', 2, 2, 0, 197),
+(10, 143, 'Mar. IV, 35-41.', '35Večer onoho dne jim řekl: „Přeplavme se na druhou stranu.“ 36Opustili tedy zástup a vzali ho, jak byl, na loďku. Byly s ním i jiné loďky. 37Tehdy se strhla veliká větrná bouře. Vlny se valily na loď a ta se už naplňovala vodou.\r\n38On ale spal na polštáři na lodní zádi. Vzbudili ho tedy: „Mistře, nezajímá tě, že umíráme?“\r\n39Když se probudil, okřikl vítr a přikázal vlnám: „Tiše, klid!“ Vítr se utišil a nastal naprostý klid.\r\n40„Proč se tak bojíte?“ řekl jim pak. „Ještě pořád nemáte víru?“\r\n41Byli z toho úplně vyděšení. „Kdo to vůbec je?“ ptali se jeden druhého. „Vždyť ho poslouchá i vítr a vlny!“', 2, 2, 1, 18);
 
 -- --------------------------------------------------------
 
@@ -72,6 +101,28 @@ INSERT INTO `jmena_nedeli` (`id`, `nazev`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Struktura tabulky `svati_dne`
+--
+
+CREATE TABLE `svati_dne` (
+  `id` int(11) NOT NULL,
+  `jmeno` varchar(150) NOT NULL,
+  `den` int(10) UNSIGNED NOT NULL,
+  `mesic` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Vypisuji data pro tabulku `svati_dne`
+--
+
+INSERT INTO `svati_dne` (`id`, `jmeno`, `den`, `mesic`) VALUES
+(1, 'Svatý prorok Zachariáš a svatá spravedlivá Elizabeta', 5, 9),
+(2, 'Svatý ctihodný Afanasij, igumen Brestský', 5, 9),
+(3, 'Svatý oddaný kníže Gleb, pokřtěný David, jeho pokrevní bratr Boris, pokřtěný Roman, synové knížete Vladimíra Kyjevského, pokřtěného Vasilije', 5, 9);
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabulky `tz`
 --
 
@@ -87,22 +138,35 @@ CREATE TABLE `tz` (
 INSERT INTO `tz` (`id`, `text`) VALUES
 (140, '(1Кор. 16, 13–24; Мф.21, 33–42). “Мария же избрала благую часть” (Лк. 10, 42). Успение Божией Матери представляет благий конец сего избрания. Сам Спаситель в успении ее принял в руки Свои ее душу. Того же сподоблялись и многие святые; тоже встречают в разных видах и степенях и все избиратели благой части. В час избрания упованием только прозревается этот конец, а в некоторой степени даже предощущается; но потом труды, борения и себя принуждения следуют одни за другими и мрачат избранный путь. Путеводною звездою остается благой конец благой части. Это тоже, что вдали светящийся огонек для путника, застигнутого темнотою. Упование — возбудитель энергии и поддержатель терпения и постоянства в начатом, а само оно крепко верою. По вере избирают, упованием бывают твердыми в избрании, а терпением достигают благого конца,'),
 (141, 'Понедельник. (2Кор. 12, 10–19; Мк.4, 10–23). Вдунул Бог дыхание жизни, и стал человек по образу Божию. То же и в возрождении: дуновением Духа Божия, который неведомо откуда и как приходит, полагаются начала новой жизни и восстановляется образ. Это — точка отправления; отсюда начинается труд возведения образа в совершенное подобие. Возрожденный по образу Создавшего Господним Духом преобразуется от славы в славу, но не без нас; наш труд и старание, а созидает и возрождении: дуновением Духа Божия, Который неведомо откуда. Вот идеал и способ осуществления в себе образа и подобия Божия! А сколько пишут и толкуют о воспитании! Между тем, в слове Божием все оно определено несколькими словами. Возьмись только осуществить предписанное, и воспитание само собою пойдет успешно к цели. Это Божий путь; но он не исключает путей человеческих, напротив, дает им направление и венчает успех. Когда же остается одно человеческое, тогда воспитание обыкновенно бывает недостаточно, с ущербом, а нередко и совсем извращает воспитываемых; затем дальше и жизнь вся идет криво. Где умножаются криво воспитанные, там и все общество более и более начинает кривиться, и в жизни, и в воззрениях своих. Конец — всеобщее искривление: кто гнет в одну сторону, кто в другую.'),
-(142, 'Вторник. (2Кор.12,20–13, 2; Мк.4, 24–34). Притча о постепенном возрастании из семени пшеницы изображает в отношении к каждому человеку постепенное возрастание потаенного в сердце человека, благодатию Божиею засеменяемого и блюдомого, а в отношении к человечеству — постепенное увеличение тела Церкви или общества спасаемых в Господе Иисусе Христе, по чину Им установленному. Этою притчею разрешается вопрос: отчего до сего времени христианство не всеобъемлюще? Как человек, бросив семя в землю, спит и встает, семя же прозябает и растет само собою без его ведома, так и Господь, положив на земле семя Божественной жизни, дал ему свободу о себе разрастаться, подчинив его естественному течению событий и не насилуя этих последних; блюдет только семя, содействует ему в частных случаях и дает общее направление. Причина этому в свободе человека. Господь ищет, чтобы человек сам себя подчинил Ему и ждет склонения его свободы; дело и длится. Если бы все зависело только от воли Божией, давно бы все были христианами. Другая мысль: созидаемое тело Церкви созидается на небе; с земли поступают только материалы, образуемые тоже небесными деятелями. Слово с неба проходит по земле и привлекает хотящих. Внявшие и последовавшие поступают, как сырцовый материал, в лабораторию Божиею, в Церковь, и здесь переделываются по образцам с неба данным. Переделанные, по исходе из этой жизни, переходят на небо и там поступают в здание Божие, каждый куда годен. Это идет непрерывно и, следовательно, дело Божие не стоит. Всеобщая торжественность христианства и не требуется для сего. Здание Божие созидается невидимо.');
+(142, 'Вторник. (2Кор.12,20–13, 2; Мк.4, 24–34). Притча о постепенном возрастании из семени пшеницы изображает в отношении к каждому человеку постепенное возрастание потаенного в сердце человека, благодатию Божиею засеменяемого и блюдомого, а в отношении к человечеству — постепенное увеличение тела Церкви или общества спасаемых в Господе Иисусе Христе, по чину Им установленному. Этою притчею разрешается вопрос: отчего до сего времени христианство не всеобъемлюще? Как человек, бросив семя в землю, спит и встает, семя же прозябает и растет само собою без его ведома, так и Господь, положив на земле семя Божественной жизни, дал ему свободу о себе разрастаться, подчинив его естественному течению событий и не насилуя этих последних; блюдет только семя, содействует ему в частных случаях и дает общее направление. Причина этому в свободе человека. Господь ищет, чтобы человек сам себя подчинил Ему и ждет склонения его свободы; дело и длится. Если бы все зависело только от воли Божией, давно бы все были христианами. Другая мысль: созидаемое тело Церкви созидается на небе; с земли поступают только материалы, образуемые тоже небесными деятелями. Слово с неба проходит по земле и привлекает хотящих. Внявшие и последовавшие поступают, как сырцовый материал, в лабораторию Божиею, в Церковь, и здесь переделываются по образцам с неба данным. Переделанные, по исходе из этой жизни, переходят на небо и там поступают в здание Божие, каждый куда годен. Это идет непрерывно и, следовательно, дело Божие не стоит. Всеобщая торжественность христианства и не требуется для сего. Здание Божие созидается невидимо.'),
+(143, 'Среда. (2Кор. 13, 3–13; Мк.4, 35–41). Ученики плывут по морю; поднимается буря и поставляет их в опасное положение, а Господь спит. Взывают к Нему: “Господи, спаси!”, и Он одним словом укрощает бурю. Другое фактическое представление порядка Божественного промышленная. И каждый человек, и народы, и Церковь — плывут по морю жизни сами, силами, в них вложенными, естественными и сверхъестественными, по порядкам, Богом заведенным. Господь почивает, хотя и пребывает среди движущихся событий; Сам же действовать начинает тогда, когда угрожает неминуемая беда, могущая уклонить направление событий, в противность Божественным Его планам. Он всюду есть, все хранит, все согревает веянием любви Своей, но действовать предоставляет Своим тварям, силами Им данными, по законам и порядкам, Им повсюду заведенным и хранимым. Он не лично вседейстующь, хотя все от Него и без Него ничего не бывает. Всегда готов Он и Сам воздействовать, когда это нужно по Его беспредельной премудрости и правде. Молитва — приемник Божиих действий. Но самая лучшая молитва: “Господи! Тебе все ведомо, сотвори со мною, как изволишь!”');
 
 --
 -- Klíče pro exportované tabulky
 --
 
 --
--- Klíče pro tabulku `denni_cteni`
+-- Klíče pro tabulku `denni_cteni_k`
 --
-ALTER TABLE `denni_cteni`
+ALTER TABLE `denni_cteni_k`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Klíče pro tabulku `denni_cteni_p`
+--
+ALTER TABLE `denni_cteni_p`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Klíče pro tabulku `jmena_nedeli`
 --
 ALTER TABLE `jmena_nedeli`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Klíče pro tabulku `svati_dne`
+--
+ALTER TABLE `svati_dne`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -116,10 +180,22 @@ ALTER TABLE `tz`
 --
 
 --
--- AUTO_INCREMENT pro tabulku `denni_cteni`
+-- AUTO_INCREMENT pro tabulku `denni_cteni_k`
 --
-ALTER TABLE `denni_cteni`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+ALTER TABLE `denni_cteni_k`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT pro tabulku `denni_cteni_p`
+--
+ALTER TABLE `denni_cteni_p`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT pro tabulku `svati_dne`
+--
+ALTER TABLE `svati_dne`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
