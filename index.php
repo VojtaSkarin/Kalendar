@@ -21,7 +21,7 @@
 
 /*
 	Databáze "databaze"
-		Relace "denni_cteni"
+		Relace "denni_cteni_p"
 			"id" - int
 				[primární klíč]
 			"den" - int
@@ -39,6 +39,7 @@
 				0 - jitřní
 				1 - liturgie
 				2 - nedefinováno
+				3 - mineje
 			"typ" - int
 				0 - apoštol
 				1 - evangelista
@@ -124,6 +125,7 @@ class Den {
 		$this->tyden = 0;
 		$this->dpp = 0;
 		$this->nazev = "";
+		$this->svati = array();
 		$this->dcteni = array();
 		$this->tz = "";
 		$this->tk = array();
@@ -148,10 +150,19 @@ class Den {
 		$this->hlas_a_tyden($datum_paschy, $datum);
 		
 		// SQL
+		$this->nacist_svate($dtb);
 		$this->nacist_cteni($dtb);
 		if ($this->den_v_tydnu == 7) $this->nacist_nazev_nedele($dtb);
 		// Tropary a kondaky
 		//$this->nacist_tk(); --TODO
+	}
+	
+	function nacist_svate($dtb) {
+		$x = $dtb->dtb->query("SELECT jmeno FROM databaze.svati_dne WHERE den='5' AND mesic='9'");
+		while ($y = $x->fetch_array()[0])
+		{
+			array_push($this->svati, $y);
+		}
 	}
 	
 	function nacist_nazev_nedele($dtb) {
@@ -209,8 +220,18 @@ class Den {
 		echo "DPP: ", $this->dpp, "<br>";
 		echo "<br><br>";
 		
+		// Svatí dne
+		echo "Svatí dne: ";
+		for ($i = 0; $i < count($this->svati); $i++)
+		{
+			echo $this->svati[$i].(($i != count($this->svati) - 1) ? "; " : "");
+		}
+		echo "<br><br>";
+		
 		// Životy svatých
-		echo "Životy svatých na dnešní den z Ochridského prologu <a href='/op/$this->s_den.pdf' target='_blank'>zde</a>.<br><br>";
+		echo "Životy svatých na dnešní den z Ochridského prologu <a href='/op/$this->s_mesic/$this->s_den.pdf'
+			target='_blank'>zde</a>.<br>";
+		echo "Životy svatých na dnešní den z Minejí <a>zde</a>. --TODO<br><br>"; // --TODO
 		
 		//Denní čtení
 		$this->vypsat_cteni();
@@ -234,16 +255,24 @@ class Den {
 	}
 	
 	function nacist_cteni($dtb) {
-		$denni_cteni = $dtb->dtb->query("SELECT * FROM databaze.denni_cteni WHERE den='$this->dpp'");
-		while ($pole = $denni_cteni->fetch_assoc())
+		// Paschální kruh
+		$denni_cteni_p = $dtb->dtb->query("SELECT * FROM databaze.denni_cteni_p WHERE den='$this->dpp'");
+		while ($pole = $denni_cteni_p->fetch_assoc())
+		{
+			array_push($this->dcteni, $pole);
+		}		
+		$this->tz = ($dtb->dtb->query("SELECT text FROM databaze.tz WHERE id='$this->dpp'"))->fetch_array()["text"];
+		
+		// Kalendářní kruh
+		$denni_cteni_k = $dtb->dtb->query("SELECT * FROM databaze.denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
+		while ($pole = $denni_cteni_k->fetch_assoc())
 		{
 			array_push($this->dcteni, $pole);
 		}
-		$this->tz = ($dtb->dtb->query("SELECT text FROM databaze.tz WHERE id='$this->dpp'"))->fetch_array()["text"];
 	}
 	
 	function vypsat_cteni() {
-		$cas = array(0=>"Jitřní", 1=>"Liturgie", 2=>"Nedefinováno");
+		$cas = array(0=>"Jitřní", 1=>"Liturgie", 2=>"Nedefinováno", 3=>"Mineje");
 		$pole = $this->dcteni;
 		for ($i = 0; $i < count($this->dcteni); $i++)
 		{
@@ -252,7 +281,7 @@ class Den {
 			echo $pole[$i]["text"], "<br><br>";
 		}
 		echo "<br>";
-		echo "Myšlenka na každý den roku od sv. Teofana Zatvornika<br>";
+		echo "Poučení na každý den roku od sv. Teofana Zatvornika<br>";
 		echo $this->tz."<br>";
 	}
 }
