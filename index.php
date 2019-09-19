@@ -158,7 +158,7 @@ class Den {
 	}
 	
 	function nacist_svate($dtb) {
-		$x = $dtb->dtb->query("SELECT jmeno FROM databaze.svati_dne WHERE den='5' AND mesic='9'");
+		$x = $dtb->dtb->query("SELECT jmeno FROM databaze.svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
 		while ($y = $x->fetch_array()[0])
 		{
 			array_push($this->svati, $y);
@@ -272,7 +272,7 @@ class Den {
 	}
 	
 	function vypsat_cteni() {
-		$cas = array(0=>"Jitřní", 1=>"Liturgie", 2=>"Nedefinováno", 3=>"Mineje");
+		$cas = array(0=>"Jitřní", 1=>"Liturgie", 2=>"Všední den", 3=>"Mineje");
 		$pole = $this->dcteni;
 		for ($i = 0; $i < count($this->dcteni); $i++)
 		{
@@ -445,7 +445,7 @@ function main() {
 	$posun = 13;
 	$datum_paschy = vratit_datum(28, 4, 2019);
 	$den = new Den();
-	$den->dnesni_den($posun, $datum_paschy, vratit_datum(), $dtb);
+	$den->dnesni_den($posun, $datum_paschy, vratit_datum(20, 9, 2019), $dtb);
 	$den->vypsat();
 	
 	$dtb->odpojit();
