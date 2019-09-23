@@ -294,8 +294,8 @@ class Den {
 			{
 				echo $cas[$this->dcteni_k[$i]["cas"]], "<br>";
 				$id = $this->dcteni_k[$i]["id_svateho"];
-				$jmeno = $this->dtb->dtb->query("SELECT druhy_pad FROM databaze.svati_dne WHERE id='$id'");
-				echo "Služba ke ".$jmeno->fetch_array()[0]."<br>";
+				$jmeno = $this->dtb->dtb->query("SELECT treti_pad FROM databaze.svati_dne WHERE id='$id'");
+				echo "Služba k ".$jmeno->fetch_array()[0]."<br>";
 				echo "[".$this->dcteni_k[$i]["zacalo"]."] ";
 				echo $this->dcteni_k[$i]["adresa"], "<br>";
 				echo $this->dcteni_k[$i]["text"], "<br><br>";
@@ -485,7 +485,7 @@ function main() {
 	
 	$den = new Den();
 	$den->dtb = dtb_start();
-	$den->dnesni_den($posun, $datum_paschy, vratit_datum());
+	$den->dnesni_den($posun, $datum_paschy, vratit_datum(24, 9, 2019));
 	$den->vypsat();
 	
 	$den->dtb->odpojit();
