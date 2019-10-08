@@ -303,6 +303,7 @@ class Den {
 		$this->n_rok = $this->rozhrani->datum->datum_dne->rok;
 		$this->den_v_tydnu = $this->rozhrani->datum->datum_dne->den_v_tydnu;
 		// Starý styl
+		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic >= 8 && $this->n_den >= 14) ? 1 : 0);
 		$this->s_den = 0;
 		$this->s_mesic = $this->n_mesic;
 		if ($this->n_den >= $posun + 1) $this->s_den = $this->n_den - $posun;
@@ -311,7 +312,6 @@ class Den {
 			$this->s_mesic += ($this->s_mesic != 1) ? -1 : 11;
 			$this->s_den = dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
 		}
-		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic >= 8 && $this->n_den >= 14) ? 1 : 0);
 		// Pomocne udaje		
 		$this->hlas = 0;
 		$this->tyden = 0;
@@ -337,7 +337,7 @@ class Den {
 	
 	function hlas_a_tyden() {
 		$this->dpp = Datum::rozdil_dnu($this->rozhrani->datum->datum_paschy, $this->rozhrani->datum->datum_dne);
-		$this->tyden = podil($this->dpp) + (($this->den_v_tydnu == 7) ? 1 : 0);
+		$this->tyden = Den::podil($this->dpp) + (($this->den_v_tydnu == 7) ? 1 : 0);
 		$this->hlas = (($this->tyden - 2) % 8) + 1;
 	}
 	
@@ -488,6 +488,12 @@ class Den {
 			echo $this->tz."<br>";
 		}
 	}
+	
+	public static function podil($cislo) {
+		$podil = intdiv($cislo, 7);
+		if ($cislo % 7 != 0) $podil++;
+		return $podil;
+	}
 }
 
 
@@ -496,14 +502,6 @@ class Den {
 function dvm($mesic, $rok) {
 	return array(31, ($rok % 4 == 0) ? 29 : 28, 31,
 			30, 31, 30, 31, 31, 30, 31, 30, 31)[$mesic - 1];
-}
-function podil($cislo) {
-	$podil = intdiv($cislo, 7);
-	if ($cislo % 7 != 0)
-	{
-		$podil++;
-	}
-	return $podil;
 }
 
 
@@ -527,7 +525,7 @@ class Main {
 		$udaje = new Udaje("localhost", "root", "", "databaze");
 		
 		$rozhrani->dtb_start($udaje);
-		$rozhrani->nastav_datum(Datum::vratit_datum(27, 9, 2019));
+		$rozhrani->nastav_datum(Datum::vratit_datum());
 		$rozhrani->nastav_udaje($posun);
 		$rozhrani->den->vypsat();		
 		$rozhrani->dtb->odpojit();
