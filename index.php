@@ -70,6 +70,115 @@
 		týden po Padesátnici. Tento pořádek se již nemění.
 */
 
+###################################################################################################
+
+class Rozhrani {
+	function Rozhrani() {
+		$this->dtb = null;
+		$this->datum = null;
+		$this->den = null;
+	}
+	
+	function dtb_start($udaje) {
+		$this->dtb = new Dtb($udaje->jmeno_dtb);
+		$this->dtb->pripojit($udaje);
+		$this->dtb->prikaz("SET NAMES utf8");
+	}
+	
+	function nastav_datum($datum_dne) {
+		$this->datum = new Skupina_dat($datum_dne);
+	}
+	
+	function nastav_udaje($posun) {
+		$this->den = new Den($this, $posun);
+	}
+}
+
+
+###################################################################################################
+
+class Dtb {
+	function Dtb($jmeno_dtb) {
+		$this->dtb = NULL;
+		$this->jmeno_dtb = $jmeno_dtb;
+	}
+	
+	function pripojit($udaje) {
+		$this->dtb = new mysqli($udaje->adresa, $udaje->jmeno, $udaje->heslo);
+		if ($this->dtb->connect_error)
+		{
+			echo "Problém s připojením<br>";
+		}
+	}
+	
+	function odpojit() {
+		$this->dtb->close();
+	}
+	
+	function prikaz($prikaz, $debug=0) {
+		if ($this->dtb->query($prikaz) === TRUE)
+		{
+			if ($debug) echo "Úspěšně provededno<br>";
+		}
+		else
+		{
+			echo $this->dtb->error, "<br>";
+		}
+	}
+	
+	function vytvor_databazi($nazev) {
+		$this->prikaz("CREATE DATABASE IF NOT EXISTS $nazev");
+	}
+	
+	function vytvor_relaci($databaze, $relace, $sloupce) {
+		$this->prikaz("CREATE TABLE $databaze.$relace (
+		$sloupce
+		)");
+	}
+	
+	function smaz_relaci($databaze, $relace) {
+		$this->prikaz("DROP TABLE $databaze.$relace");
+	}
+	
+	function vloz_data($databaze, $relace, $sloupce, $hodnoty, $debug=0) {
+		$prikaz = "INSERT INTO $databaze.$relace
+		($sloupce) VALUES
+		($hodnoty)";
+		if ($debug) echo $prikaz, "<br>";
+		$this->prikaz($prikaz);
+	}
+}
+
+
+###################################################################################################
+
+class Udaje {
+	function Udaje($adresa, $jmeno, $heslo, $jmeno_dtb) {
+		$this->adresa = $adresa;
+		$this->jmeno = $jmeno;
+		$this->heslo = $heslo;
+		$this->jmeno_dtb = $jmeno_dtb;
+	}
+}
+
+
+###################################################################################################
+
+class Skupina_dat {
+	function Skupina_dat ($datum_dne) {		
+		$this->datum_serveru = new Datum();
+		$this->datum_serveru->dnesni_datum();
+		
+		$this->datum_paschy = new Datum();
+		$this->datum_paschy->datum_paschy($this->datum_serveru);
+		
+		$this->datum_dne = $datum_dne;
+		$this->datum_dne->nastav_den_v_tydnu($this->datum_serveru);
+	}
+}
+
+
+###################################################################################################
 
 class Datum {
 	function Datum() {
@@ -91,11 +200,81 @@ class Datum {
 		$this->den_v_tydnu = (int) $pole[3];
 	}
 	
+	function datum_paschy($datum_serveru) {
+		$data = array(2019 => array(28, 4));		
+		
+		$this->nastavit($data[$datum_serveru->rok][0], $data[$datum_serveru->rok][1], $datum_serveru->rok);		
+		if (Datum::porovnej($this, $datum_serveru))
+		{
+			$this->nastavit($data[$datum_serveru->rok - 1][0], $data[$datum_serveru->rok - 1][1], $datum_serveru->rok);
+		}
+		
+		$this->nastav_den_v_tydnu($datum_serveru);
+	}
+	
+	function nastav_den_v_tydnu($datum_serveru) {
+		$this->den_v_tydnu = ($datum_serveru->den_v_tydnu + Datum::rozdil_dnu($this, $datum_serveru) + 7) % 7;
+	}
+	
 	function vypsat() {
 		echo $this->den, ". ", $this->mesic, ". ", $this->rok,
 			" den: ", $this->den_v_tydnu, "<br>";
 	}
+	
+	// První je novější, než druhý => 1, jinak 0
+	public static function porovnej($prvni, $druhy) {
+		if ($prvni->rok > $druhy->rok) return 1;
+		else if ($prvni->rok < $druhy->rok) return 0;
+		
+		if ($prvni->mesic > $druhy->mesic) return 1;
+		else if ($prvni->mesic < $druhy->mesic) return 0;
+		
+		if ($prvni->den > $druhy->den)return 1;
+		else return 0;
+	}
+	
+	public static function rozdil_dnu($prvni, $druhy) {
+		$zmena = Datum::porovnej($prvni, $druhy);
+		
+		if ($zmena)
+		{
+			$zaloha = $prvni;
+			$prvni = $druhy;
+			$druhy = $zaloha;
+		}
+
+		$pocet_dni = 0;
+		
+		if ($prvni->mesic != $druhy->mesic)
+		{
+			for ($i = $prvni->mesic + 1; $i < $druhy->mesic; $i++)
+			{
+				$pocet_dni += dvm($i, $prvni->rok);
+			}
+			
+			$pocet_dni += dvm($prvni->mesic, $prvni->rok) - $prvni->den;
+			$pocet_dni += $druhy->den;
+		}
+		else $pocet_dni += $druhy->den - $prvni->den;
+		
+		if ($zmena) $pocet_dni = -$pocet_dni;
+		
+		return $pocet_dni;
+	}
+	
+	public static function vratit_datum($den=0, $mesic=0, $rok=0) {
+		$datum = new Datum();
+		
+		if ($den) $datum->nastavit($den, $mesic, $rok);
+		else $datum->dnesni_datum();
+		
+		return $datum;
+	}
 }
+
+
+###################################################################################################
+
 class Svaty {
 	function Svaty($retezec) {
 		$pole = explode("@", $retezec);
@@ -112,26 +291,33 @@ class Tk {
 	}
 }
 
-class Udaje {
-	function Udaje($adresa, $jmeno, $heslo) {
-		$this->adresa = $adresa;
-		$this->jmeno = $jmeno;
-		$this->heslo = $heslo;
-	}
-}
-	
+
+###################################################################################################
+
 class Den {
-	function Den() {
+	function Den($rozhrani, $posun) {
+		$this->rozhrani = $rozhrani;
+		// Nový styl
+		$this->n_den = $this->rozhrani->datum->datum_dne->den;
+		$this->n_mesic = $this->rozhrani->datum->datum_dne->mesic;
+		$this->n_rok = $this->rozhrani->datum->datum_dne->rok;
+		$this->den_v_tydnu = $this->rozhrani->datum->datum_dne->den_v_tydnu;
+		// Starý styl
 		$this->s_den = 0;
-		$this->s_mesic = 0;
-		$this->s_rok = 0;
-		$this->n_den = 0;
-		$this->n_mesic = 0;
-		$this->n_rok = 0;
-		$this->den_v_tydnu = 0;
+		$this->s_mesic = $this->n_mesic;
+		if ($this->n_den >= $posun + 1) $this->s_den = $this->n_den - $posun;
+		else
+		{
+			$this->s_mesic += ($this->s_mesic != 1) ? -1 : 11;
+			$this->s_den = dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
+		}
+		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic >= 8 && $this->n_den >= 14) ? 1 : 0);
+		// Pomocne udaje		
 		$this->hlas = 0;
 		$this->tyden = 0;
 		$this->dpp = 0;
+		$this->hlas_a_tyden();
+		// Ostatni
 		$this->nazev = "";
 		$this->velky_svatek = "";
 		$this->svati = array();
@@ -139,28 +325,7 @@ class Den {
 		$this->dcteni_k = array();
 		$this->tz = "";
 		$this->tk = array();
-		$this->dtb = NULL;
 		$this->jmeno_databaze = NULL;
-	}
-	
-	function dnesni_den($posun, $datum_paschy, $datum) {
-		$this->n_den = $datum->den;
-		$this->n_mesic = $this->s_mesic = $datum->mesic;
-		if ($this->n_den >= 14)
-		{
-			$this->s_den = $this->n_den - $posun;
-		}
-		else
-		{
-			$this->s_mesic += ($this->s_mesic != 1) ? -1 : 11;
-			$this->s_den = dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
-		}
-		$this->n_rok = $datum->rok;
-		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic >= 8
-			&& $this->n_den >= 14) ? 1 : 0);
-		$this->den_v_tydnu = $datum->den_v_tydnu;
-		$this->hlas_a_tyden($datum_paschy, $datum);
-		
 		// SQL
 		$this->nacist_velky_svatek();
 		$this->nacist_svate();
@@ -170,12 +335,18 @@ class Den {
 		//$this->nacist_tk(); --TODO
 	}
 	
+	function hlas_a_tyden() {
+		$this->dpp = Datum::rozdil_dnu($this->rozhrani->datum->datum_paschy, $this->rozhrani->datum->datum_dne);
+		$this->tyden = podil($this->dpp) + (($this->den_v_tydnu == 7) ? 1 : 0);
+		$this->hlas = (($this->tyden - 2) % 8) + 1;
+	}
+	
 	function nacist_velky_svatek() {
-		$this->velky_svatek = $this->dtb->dtb->query("SELECT nazev FROM $this->jmeno_databaze.velke_svatky WHERE den='$this->s_den' AND mesic='$this->s_mesic'")->fetch_array()[0];
+		$this->velky_svatek = ($this->rozhrani->dtb->dtb->query("SELECT nazev FROM ".$this->rozhrani->dtb->jmeno_dtb.".velke_svatky WHERE den='$this->s_den' AND mesic='$this->s_mesic'"))->fetch_array()[0];
 	}
 	
 	function nacist_svate() {
-		$x = $this->dtb->dtb->query("SELECT jmeno FROM $this->jmeno_databaze.svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
+		$x = $this->rozhrani->dtb->dtb->query("SELECT jmeno FROM ".$this->rozhrani->dtb->jmeno_dtb.".svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
 		while ($y = $x->fetch_array()[0])
 		{
 			array_push($this->svati, $y);
@@ -270,23 +441,17 @@ class Den {
 		*/
 	}
 	
-	function hlas_a_tyden($datum_paschy, $dnesni_datum) {
-		$this->dpp = rozdil_dnu($datum_paschy, $dnesni_datum);
-		$this->tyden = podil($this->dpp) + (($this->den_v_tydnu == 7) ? 1 : 0);
-		$this->hlas = (($this->tyden - 2) % 8) + 1;
-	}
-	
 	function nacist_cteni() {
 		// Paschální kruh
-		$denni_cteni_p = $this->dtb->dtb->query("SELECT * FROM $this->jmeno_databaze.denni_cteni_p WHERE den='$this->dpp'");
+		$denni_cteni_p = $this->rozhrani->dtb->dtb->query("SELECT * FROM ".$this->rozhrani->dtb->jmeno_dtb.".denni_cteni_p WHERE den='$this->dpp'");
 		while ($pole = $denni_cteni_p->fetch_assoc())
 		{
 			array_push($this->dcteni_p, $pole);
 		}		
-		$this->tz = ($this->dtb->dtb->query("SELECT text FROM $this->jmeno_databaze.tz WHERE id='$this->dpp'"))->fetch_array()["text"];
+		$this->tz = ($this->rozhrani->dtb->dtb->query("SELECT text FROM ".$this->rozhrani->dtb->jmeno_dtb.".tz WHERE id='$this->dpp'"))->fetch_array()["text"];
 		
 		// Kalendářní kruh
-		$denni_cteni_k = $this->dtb->dtb->query("SELECT * FROM $this->jmeno_databaze.denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
+		$denni_cteni_k = $this->rozhrani->dtb->dtb->query("SELECT * FROM ".$this->rozhrani->dtb->jmeno_dtb.".denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
 		while ($pole = $denni_cteni_k->fetch_assoc())
 		{
 			array_push($this->dcteni_k, $pole);
@@ -324,59 +489,10 @@ class Den {
 		}
 	}
 }
-function vratit_datum($den=0, $mesic=0, $rok=0) {
-	$dnesni_datum = new Datum();
-	$dnesni_datum->dnesni_datum();
-	if (!$den)
-	{
-		return $dnesni_datum;
-	}
-	
-	$datum = new Datum();
-	$datum->nastavit($den, $mesic, $rok);
-	
-	$datum->den_v_tydnu = (($dnesni_datum->den_v_tydnu - rozdil_dnu($datum, $dnesni_datum) % 7) + 7) % 7;
-	if (!$datum->den_v_tydnu)
-	{
-		$datum->den_v_tydnu = 7;
-	}
-	
-	return $datum;
-}
-function rozdil_dnu($prvni, $druhy) {
-	$zmena = porovnej($prvni, $druhy);
-	
-	if ($zmena)
-	{
-		$zaloha = $prvni;
-		$prvni = $druhy;
-		$druhy = $zaloha;
-	}
 
-	$pocet_dni = 0;
-	
-	if ($prvni->mesic != $druhy->mesic)
-	{
-		for ($i = $prvni->mesic + 1; $i < $druhy->mesic; $i++)
-		{
-			$pocet_dni += dvm($i, $prvni->rok);
-		}
-		
-		$pocet_dni += dvm($prvni->mesic, $prvni->rok) - $prvni->den;
-		$pocet_dni += $druhy->den;
-	}
-	else
-	{
-		$pocet_dni += $druhy->den - $prvni->den;
-	}
-	
-	if ($zmena)
-	{
-		$pocet_dni = -$pocet_dni;
-	}
-	
-	return $pocet_dni;
-}
+
+###################################################################################################
+
 function dvm($mesic, $rok) {
 	return array(31, ($rok % 4 == 0) ? 29 : 28, 31,
 			30, 31, 30, 31, 31, 30, 31, 30, 31)[$mesic - 1];
@@ -389,35 +505,7 @@ function podil($cislo) {
 	}
 	return $podil;
 }
-function porovnej($prvni, $druhy) {
-	
-	if ($prvni->rok > $druhy->rok)
-	{
-		return 1;
-	}
-	else if ($prvni->rok < $druhy->rok)
-	{
-		return 0;
-	}
-	
-	if ($prvni->mesic > $druhy->mesic)
-	{
-		return 1;
-	}
-	else if ($prvni->mesic < $druhy->mesic)
-	{
-		return 0;
-	}
-	
-	if ($prvni->den > $druhy->den)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
+
 
 function obsahuje($a, $b) {
 	if ($b == "0") return True;
@@ -429,80 +517,26 @@ function obsahuje($a, $b) {
 }
 
 
-class Dtb {
-	function Dtb() {
-		$this->dtb = NULL;
-	}
-	
-	function pripojit($udaje) {
-		$this->dtb = new mysqli($udaje->adresa, $udaje->jmeno, $udaje->heslo);
-		if ($this->dtb->connect_error)
-		{
-			echo "Problém s připojením<br>";
-		}
-	}
-	
-	function odpojit() {
-		$this->dtb->close();
-	}
-	
-	function prikaz($prikaz, $debug=0) {
-		if ($this->dtb->query($prikaz) === TRUE)
-		{
-			if ($debug) echo "Úspěšně provededno<br>";
-		}
-		else
-		{
-			echo $this->dtb->error, "<br>";
-		}
-	}
-	
-	function vytvor_databazi($nazev) {
-		$this->prikaz("CREATE DATABASE IF NOT EXISTS $nazev");
-	}
-	
-	function vytvor_relaci($databaze, $relace, $sloupce) {
-		$this->prikaz("CREATE TABLE $databaze.$relace (
-		$sloupce
-		)");
-	}
-	
-	function smaz_relaci($databaze, $relace) {
-		$this->prikaz("DROP TABLE $databaze.$relace");
-	}
-	
-	function vloz_data($databaze, $relace, $sloupce, $hodnoty, $debug=0) {
-		$prikaz = "INSERT INTO $databaze.$relace
-		($sloupce) VALUES
-		($hodnoty)";
-		if ($debug) echo $prikaz, "<br>";
-		$this->prikaz($prikaz);
+###################################################################################################
+
+class Main {
+	public static function f_main() {		
+		$rozhrani = new Rozhrani();
+		
+		$posun = 13;
+		$udaje = new Udaje("localhost", "root", "", "databaze");
+		
+		$rozhrani->dtb_start($udaje);
+		$rozhrani->nastav_datum(Datum::vratit_datum(27, 9, 2019));
+		$rozhrani->nastav_udaje($posun);
+		$rozhrani->den->vypsat();		
+		$rozhrani->dtb->odpojit();
 	}
 }
 
-function dtb_start($udaje) {
-	$dtb = new Dtb();
-	$dtb->pripojit($udaje);
-	$dtb->prikaz("SET NAMES utf8");
-	return $dtb;
-}
-
-function main() {		
-	$posun = 13;
-	$datum_paschy = vratit_datum(28, 4, 2019);
-	
-	$udaje = new Udaje("localhost", "root", "");
-	
-	$den = new Den();
-	$den->jmeno_databaze = "databaze";
-	$den->dtb = dtb_start($udaje);
-	$den->dnesni_den($posun, $datum_paschy, vratit_datum(27, 9, 2019));
-	$den->vypsat();
-	
-	$den->dtb->odpojit();
-}
-main();
+Main::f_main();
 ?>
+
 </body>
 
 </html>
