@@ -79,9 +79,9 @@ class Rozhrani {
 		$this->den = null;
 	}
 	
-	function dtb_start($udaje) {
-		$this->dtb = new Dtb($udaje->jmeno_dtb);
-		$this->dtb->pripojit($udaje);
+	function dtb_start() {
+		include '.prihlasovaci_udaje.php';
+		$this->dtb = new Dtb($adresa, $jmeno, $heslo, $jmeno_dtb);
 		$this->dtb->prikaz("SET NAMES utf8");
 	}
 	
@@ -98,17 +98,10 @@ class Rozhrani {
 ###################################################################################################
 
 class Dtb {
-	function Dtb($jmeno_dtb) {
-		$this->dtb = NULL;
+	function Dtb($adresa, $jmeno, $heslo, $jmeno_dtb) {
+		$this->dtb = new mysqli($adresa, $jmeno, $heslo);
+		if ($this->dtb->connect_error) echo "Problém s připojením<br>";
 		$this->jmeno_dtb = $jmeno_dtb;
-	}
-	
-	function pripojit($udaje) {
-		$this->dtb = new mysqli($udaje->adresa, $udaje->jmeno, $udaje->heslo);
-		if ($this->dtb->connect_error)
-		{
-			echo "Problém s připojením<br>";
-		}
 	}
 	
 	function odpojit() {
@@ -116,14 +109,8 @@ class Dtb {
 	}
 	
 	function prikaz($prikaz, $debug=0) {
-		if ($this->dtb->query($prikaz) === TRUE)
-		{
-			if ($debug) echo "Úspěšně provededno<br>";
-		}
-		else
-		{
-			echo $this->dtb->error, "<br>";
-		}
+		if ($this->dtb->query($prikaz) === TRUE) { if ($debug) echo "Úspěšně provededno<br>"; }
+		else echo $this->dtb->error, "<br>";
 	}
 	
 	function vytvor_databazi($nazev) {
@@ -146,18 +133,6 @@ class Dtb {
 		($hodnoty)";
 		if ($debug) echo $prikaz, "<br>";
 		$this->prikaz($prikaz);
-	}
-}
-
-
-###################################################################################################
-
-class Udaje {
-	function Udaje($adresa, $jmeno, $heslo, $jmeno_dtb) {
-		$this->adresa = $adresa;
-		$this->jmeno = $jmeno;
-		$this->heslo = $heslo;
-		$this->jmeno_dtb = $jmeno_dtb;
 	}
 }
 
@@ -249,10 +224,10 @@ class Datum {
 		{
 			for ($i = $prvni->mesic + 1; $i < $druhy->mesic; $i++)
 			{
-				$pocet_dni += dvm($i, $prvni->rok);
+				$pocet_dni += Datum::dvm($i, $prvni->rok);
 			}
 			
-			$pocet_dni += dvm($prvni->mesic, $prvni->rok) - $prvni->den;
+			$pocet_dni += Datum::dvm($prvni->mesic, $prvni->rok) - $prvni->den;
 			$pocet_dni += $druhy->den;
 		}
 		else $pocet_dni += $druhy->den - $prvni->den;
@@ -269,6 +244,10 @@ class Datum {
 		else $datum->dnesni_datum();
 		
 		return $datum;
+	}
+	
+	public static function dvm($mesic, $rok) {
+		return array(31, ($rok % 4 == 0) ? 29 : 28, 31,	30, 31, 30, 31, 31, 30, 31, 30, 31)[$mesic - 1];
 	}
 }
 
@@ -310,7 +289,7 @@ class Den {
 		else
 		{
 			$this->s_mesic += ($this->s_mesic != 1) ? -1 : 11;
-			$this->s_den = dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
+			$this->s_den = Datum::dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
 		}
 		// Pomocne udaje		
 		$this->hlas = 0;
@@ -422,7 +401,7 @@ class Den {
 		echo "<br><br>";
 		
 		// Životy svatých
-		echo "Životy svatých na dnešní den z Ochridského prologu <a href='/op/$this->s_mesic/$this->s_den.pdf'
+		echo "Životy svatých na dnešní den z Ochridského prologu <a href='./op/$this->s_mesic/$this->s_den.pdf'
 			target='_blank'>zde</a>.<br>";
 		echo "Životy svatých na dnešní den z Minejí <a>zde</a>. --TODO<br><br>"; // --TODO
 		
@@ -499,12 +478,6 @@ class Den {
 
 ###################################################################################################
 
-function dvm($mesic, $rok) {
-	return array(31, ($rok % 4 == 0) ? 29 : 28, 31,
-			30, 31, 30, 31, 31, 30, 31, 30, 31)[$mesic - 1];
-}
-
-
 function obsahuje($a, $b) {
 	if ($b == "0") return True;
 	for ($i = 0; $i < strlen($b); $i++)
@@ -518,13 +491,12 @@ function obsahuje($a, $b) {
 ###################################################################################################
 
 class Main {
-	public static function f_main() {		
+	public static function f_main() {
 		$rozhrani = new Rozhrani();
 		
 		$posun = 13;
-		$udaje = new Udaje("localhost", "root", "", "databaze");
 		
-		$rozhrani->dtb_start($udaje);
+		$rozhrani->dtb_start();
 		$rozhrani->nastav_datum(Datum::vratit_datum());
 		$rozhrani->nastav_udaje($posun);
 		$rozhrani->den->vypsat();		
