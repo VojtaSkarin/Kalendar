@@ -321,11 +321,11 @@ class Den {
 	}
 	
 	function nacist_velky_svatek() {
-		$this->velky_svatek = ($this->rozhrani->dtb->dtb->query("SELECT nazev FROM ".$this->rozhrani->dtb->jmeno_dtb.".velke_svatky WHERE den='$this->s_den' AND mesic='$this->s_mesic'"))->fetch_array()[0];
+		$this->velky_svatek = ($this->rozhrani->dtb->dtb->query("SELECT nazev FROM {$this->rozhrani->dtb->jmeno_dtb}.velke_svatky WHERE den='$this->s_den' AND mesic='$this->s_mesic'"))->fetch_array()[0];
 	}
 	
 	function nacist_svate() {
-		$x = $this->rozhrani->dtb->dtb->query("SELECT jmeno FROM ".$this->rozhrani->dtb->jmeno_dtb.".svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
+		$x = $this->rozhrani->dtb->dtb->query("SELECT jmeno FROM {$this->rozhrani->dtb->jmeno_dtb}.svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
 		while ($y = $x->fetch_array()[0])
 		{
 			array_push($this->svati, $y);
@@ -341,6 +341,7 @@ class Den {
 	}
 	
 	function vypsat() {
+		// Základní info
 		$den_v_tydnu = array("Pondělí", "Úterý", "Středa",
 			"Čtvrtek", "Pátek", "Sobota", "Neděle");
 		$mesic = array("leden", "únor", "březen", "duben",
@@ -373,27 +374,27 @@ class Den {
 			{
 				echo "8. neděle po Pasše";
 			}
-		}		
-		echo (($this->den_v_tydnu == 7) ? " - " : "").$this->nazev."<br>";
-		// Konec týdnování
+		}
 		
+		// Jméno neděle
+		echo (($this->den_v_tydnu == 7) ? " - " : "").$this->nazev."<br>";
+		
+		// Hlas
 		if ($this->hlas)
 		{
 			echo "Hlas ", $this->hlas, ".<br>";
 		}
 		
 		// Debug info
-		echo "T: ", $this->tyden, "<br>";
-		echo "DPP: ", $this->dpp, "<br>";
+		echo "[T: ", $this->tyden, "]<br>";
+		echo "[DPP: ", $this->dpp, "]<br>";
 		echo "<br><br>";
 		
-		// Svatí dne
-		if ($this->velky_svatek != "")
-		{
-			echo "Velký svátek: ".$this->velky_svatek."<br>";
-		}
+		// Velké svátky
+		echo "Velký svátek: ".(($this->velky_svatek == "") ? "<i>Není velký svátek</i>" : $this->velky_svatek)."<br>";
 		
-		echo "Svatí dne: ";
+		// Svatí podle mineje
+		echo "Svatí z mineje: ";
 		for ($i = 0; $i < count($this->svati); $i++)
 		{
 			echo $this->svati[$i].(($i != count($this->svati) - 1) ? "; " : "");
@@ -422,15 +423,15 @@ class Den {
 	
 	function nacist_cteni() {
 		// Paschální kruh
-		$denni_cteni_p = $this->rozhrani->dtb->dtb->query("SELECT * FROM ".$this->rozhrani->dtb->jmeno_dtb.".denni_cteni_p WHERE den='$this->dpp'");
+		$denni_cteni_p = $this->rozhrani->dtb->dtb->query("SELECT * FROM {$this->rozhrani->dtb->jmeno_dtb}.denni_cteni_p WHERE den='$this->dpp'");
 		while ($pole = $denni_cteni_p->fetch_assoc())
 		{
 			array_push($this->dcteni_p, $pole);
 		}		
-		$this->tz = ($this->rozhrani->dtb->dtb->query("SELECT text FROM ".$this->rozhrani->dtb->jmeno_dtb.".tz WHERE id='$this->dpp'"))->fetch_array()["text"];
+		$this->tz = ($this->rozhrani->dtb->dtb->query("SELECT text FROM {$this->rozhrani->dtb->jmeno_dtb}.tz WHERE id='$this->dpp'"))->fetch_array()["text"];
 		
 		// Kalendářní kruh
-		$denni_cteni_k = $this->rozhrani->dtb->dtb->query("SELECT * FROM ".$this->rozhrani->dtb->jmeno_dtb.".denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
+		$denni_cteni_k = $this->rozhrani->dtb->dtb->query("SELECT * FROM {$this->rozhrani->dtb->jmeno_dtb}.denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
 		while ($pole = $denni_cteni_k->fetch_assoc())
 		{
 			array_push($this->dcteni_k, $pole);
