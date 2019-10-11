@@ -56,6 +56,31 @@
 */
 
 /*
+	Objekty
+		Rozhraní
+			dtb - přístup k databázi
+				objekt Dtb
+			datum - kalendářní data
+				objekt Skupina_dat
+			den - údaje konkrétního dne, které se na stránce vypisují
+				objekt Den	
+		Skupina_dat
+			datum_serveru
+				objekt Datum
+			datum_dne
+				objekt Datum
+			datum_paschy
+				objekt Datum
+		Datum
+			den
+			mesic
+			rok
+			den_v_tydnu
+			
+			vypsat - vrátí formátovaný řetězec
+*/
+
+/*
 	Týdnování
 		Pascha je v neděli. Týden následující pondělím po Pasše se nazývá "Světlý týden"
 		a trvá do soboty včetně. Následující neděle, která je první nedělí po Pasše se
@@ -188,7 +213,7 @@ class Datum {
 	}
 	
 	function nastav_den_v_tydnu($datum_serveru) {
-		$this->den_v_tydnu = ($datum_serveru->den_v_tydnu + Datum::rozdil_dnu($this, $datum_serveru) + 7) % 7;
+		$this->den_v_tydnu = ((($datum_serveru->den_v_tydnu - 1 - Datum::rozdil_dnu($this, $datum_serveru)) % 7 + 7) % 7) + 1;
 	}
 	
 	function vypsat() {
@@ -210,7 +235,6 @@ class Datum {
 	
 	public static function rozdil_dnu($prvni, $druhy) {
 		$zmena = Datum::porovnej($prvni, $druhy);
-		
 		if ($zmena)
 		{
 			$zaloha = $prvni;
@@ -233,7 +257,6 @@ class Datum {
 		else $pocet_dni += $druhy->den - $prvni->den;
 		
 		if ($zmena) $pocet_dni = -$pocet_dni;
-		
 		return $pocet_dni;
 	}
 	
@@ -282,7 +305,7 @@ class Den {
 		$this->n_rok = $this->rozhrani->datum->datum_dne->rok;
 		$this->den_v_tydnu = $this->rozhrani->datum->datum_dne->den_v_tydnu;
 		// Starý styl
-		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic >= 8 && $this->n_den >= 14) ? 1 : 0);
+		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic > 9 || ($this->n_mesic == 9 && $this->n_den >= 14)) ? 1 : 0);
 		$this->s_den = 0;
 		$this->s_mesic = $this->n_mesic;
 		if ($this->n_den >= $posun + 1) $this->s_den = $this->n_den - $posun;
@@ -291,18 +314,20 @@ class Den {
 			$this->s_mesic += ($this->s_mesic != 1) ? -1 : 11;
 			$this->s_den = Datum::dvm($this->s_mesic, $this->s_rok) - $posun + $this->n_den;
 		}
-		// Pomocne udaje		
+		// Hlas a týden		
 		$this->hlas = 0;
-		$this->tyden = 0;
 		$this->dpp = 0;
-		$this->hlas_a_tyden();
+		$this->tyden = 0;
+		$this->nacist_hlas_a_tyden();
+		// Teofan Zatvornik
+		$this->tz = null;
+		$this->nacist_tz();
 		// Ostatni
 		$this->nazev = "";
 		$this->velky_svatek = "";
 		$this->svati = array();
 		$this->dcteni_p = array();
-		$this->dcteni_k = array();
-		$this->tz = "";
+		$this->dcteni_k = array();		
 		$this->tk = array();
 		$this->jmeno_databaze = NULL;
 		// SQL
@@ -314,10 +339,22 @@ class Den {
 		//$this->nacist_tk(); --TODO
 	}
 	
-	function hlas_a_tyden() {
+	function nacist_hlas_a_tyden() {
 		$this->dpp = Datum::rozdil_dnu($this->rozhrani->datum->datum_paschy, $this->rozhrani->datum->datum_dne);
 		$this->tyden = Den::podil($this->dpp) + (($this->den_v_tydnu == 7) ? 1 : 0);
 		$this->hlas = (($this->tyden - 2) % 8) + 1;
+	}
+	
+	function nacist_tz() {
+		$dny = array(1 => "Понедельник", 2 => "Вторник", 3 => "Среда", 4 => "Четверг", 5 => "Пятница", 6 => "Суббота");
+		$cesta = "./tz/index_split_".sprintf("%03d", $this->tyden + 15).".xhtml";
+		
+		$soubor = fopen($cesta, "r") or die("Nepodařilo se otevřít soubor");
+		$text = fread($soubor, filesize($cesta));
+		$text = strstr($text, "<div class=\"paragraph\"><b class=\"calibre10\">".$dny[$this->den_v_tydnu]);
+		$text = strstr($text, "<p class=\"calibre9\" style=\"margin:0pt; border:0pt; height:1em\">", true);
+		
+		$this->tz = $text;
 	}
 	
 	function nacist_velky_svatek() {
@@ -326,10 +363,7 @@ class Den {
 	
 	function nacist_svate() {
 		$x = $this->rozhrani->dtb->dtb->query("SELECT jmeno FROM {$this->rozhrani->dtb->jmeno_dtb}.svati_dne WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
-		while ($y = $x->fetch_array()[0])
-		{
-			array_push($this->svati, $y);
-		}
+		while ($y = $x->fetch_array()[0]) array_push($this->svati, $y);
 	}
 	
 	function nacist_nazev_nedele() {
@@ -406,8 +440,12 @@ class Den {
 			target='_blank'>zde</a>.<br>";
 		echo "Životy svatých na dnešní den z Minejí <a>zde</a>. --TODO<br><br>"; // --TODO
 		
-		//Denní čtení
-		$this->vypsat_cteni();
+		// Denní čtení
+		//$this->vypsat_cteni();
+		
+		// Teofan Zatvornik
+		echo "Poučení na každý den roku od sv. Teofana Zatvornika<br>";
+		echo $this->tz."<br>";
 		
 		// Jména svatých, tropary a kondaky - TODO
 		/*
@@ -427,8 +465,7 @@ class Den {
 		while ($pole = $denni_cteni_p->fetch_assoc())
 		{
 			array_push($this->dcteni_p, $pole);
-		}		
-		$this->tz = ($this->rozhrani->dtb->dtb->query("SELECT text FROM {$this->rozhrani->dtb->jmeno_dtb}.tz WHERE id='$this->dpp'"))->fetch_array()["text"];
+		}
 		
 		// Kalendářní kruh
 		$denni_cteni_k = $this->rozhrani->dtb->dtb->query("SELECT * FROM {$this->rozhrani->dtb->jmeno_dtb}.denni_cteni_k WHERE den='$this->s_den' AND mesic='$this->s_mesic'");
@@ -464,8 +501,6 @@ class Den {
 				echo $this->dcteni_p[$i]["adresa"], "<br>";
 				echo $this->dcteni_p[$i]["text"], "<br><br>";
 			}
-			echo "Poučení na každý den roku od sv. Teofana Zatvornika<br>";
-			echo $this->tz."<br>";
 		}
 	}
 	
