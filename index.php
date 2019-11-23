@@ -8,6 +8,8 @@
 <body>
 <?php
 
+include_once 'test.php';
+
 /*
 	Dny v týdnu
 		1 - Pondělí
@@ -115,7 +117,8 @@ class Rozhrani {
 	}
 	
 	function nastav_udaje($posun) {
-		$this->den = new Den($this, $posun);
+		$this->den = new Den();
+		$this->den->init($this, $posun);
 	}
 }
 
@@ -297,7 +300,29 @@ class Tk {
 ###################################################################################################
 
 class Den {
-	function Den($rozhrani, $posun) {
+	function Den() {
+		$this->rozhrani = null;
+		$this->n_den = null;
+		$this->n_mesic = null;
+		$this->n_rok = null;
+		$this->den_v_tydnu = null;
+		$this->s_rok = null;
+		$this->s_den = null;
+		$this->s_mesic = null;
+		$this->hlas = 0;
+		$this->dpp = 0;
+		$this->tyden = 0;
+		$this->tz = null;
+		$this->nazev = null;
+		$this->velky_svatek = null;
+		$this->svati = null;
+		$this->dcteni_p = null;
+		$this->dcteni_k = null;
+		$this->tk = null;
+		$this->jmeno_databaze = null;
+	}
+	
+	function init($rozhrani, $posun) {
 		$this->rozhrani = $rozhrani;
 		// Nový styl
 		$this->n_den = $this->rozhrani->datum->datum_dne->den;
@@ -346,11 +371,12 @@ class Den {
 	}
 	
 	function nacist_tz() {
-		$dny = array(1 => "Понедельник", 2 => "Вторник", 3 => "Среда", 4 => "Четверг", 5 => "Пятница", 6 => "Суббота");
-		$cesta = "./tz/index_split_".sprintf("%03d", $this->tyden + 15).".xhtml";
+		$dny = array(1 => "Понедельник", 2 => "Вторник", 3 => "Среда", 4 => "Четверг", 5 => "Пятница", 6 => "Суббота", 7 => "");
+		$cesta = "./tz/index_split_".sprintf("%03d", $this->tyden + 15 + ($this->den_v_tydnu == 7) ? 1 : 0).".xhtml";
 		
 		$soubor = fopen($cesta, "r") or die("Nepodařilo se otevřít soubor");
 		$text = fread($soubor, filesize($cesta));
+		
 		$text = strstr($text, "<div class=\"paragraph\"><b class=\"calibre10\">".$dny[$this->den_v_tydnu]);
 		$text = strstr($text, "<p class=\"calibre9\" style=\"margin:0pt; border:0pt; height:1em\">", true);
 		
@@ -367,7 +393,7 @@ class Den {
 	}
 	
 	function nacist_nazev_nedele() {
-		$this->nazev = ($this->dtb->dtb->query("SELECT nazev FROM $this->jmeno_databaze.jmena_nedeli WHERE id='$this->tyden'"))->fetch_assoc()["nazev"];
+		$this->nazev = ($this->rozhrani->dtb->dtb->query("SELECT nazev FROM {$this->rozhrani->dtb->jmeno_dtb}.jmena_nedeli WHERE id='$this->tyden'"))->fetch_assoc()["nazev"];
 	}
 	
 	function nacist_tk() {
@@ -375,6 +401,13 @@ class Den {
 	}
 	
 	function vypsat() {
+		global $roky;
+		if ($this->porovnat($roky[$this->n_rok]->mesice[$this->n_mesic]->dny[$this->n_den])) {
+			echo "<i>OK: Test prošel</i><br>";
+		} else {
+			echo "<b>NOK: Test neprošel</b><br>";
+		}
+		#################################
 		// Základní info
 		$den_v_tydnu = array("Pondělí", "Úterý", "Středa",
 			"Čtvrtek", "Pátek", "Sobota", "Neděle");
@@ -459,6 +492,68 @@ class Den {
 		*/
 	}
 	
+	function porovnat($den) {
+		$vysledek = true;
+		if (!($this->n_den == $den->n_den)) {
+			echo "Špatný den v novém stylu!<br>";
+			echo "Měl být: ".$den->n_den."<br>";
+			echo "Ale je: ".$this->n_den."<br>";
+			return false;
+		}
+		if (!($this->n_mesic == $den->n_mesic)) {
+			echo 2;
+			$vysledek = false;
+		}
+		if (!($this->n_rok == $den->n_rok)) {
+			echo 3;
+			$vysledek = false;
+		}
+		if (!($this->den_v_tydnu == $den->den_v_tydnu)) {
+			echo "Špatný den v týdnu!<br>";
+			echo "Měl být: ".$den->den_v_tydnu."<br>";
+			echo "Ale je: ".$this->den_v_tydnu."<br>";
+			return false;
+		}
+		if (!($this->s_den == $den->s_den)) {
+			echo 5;
+			$vysledek = false;
+		}
+		if (!($this->s_mesic == $den->s_mesic)) {
+			echo 6;
+			$vysledek = false;
+		}
+		if (!($this->s_rok == $den->s_rok)) {
+			echo 7;
+			$vysledek = false;
+		}
+		if (!($this->hlas == $den->hlas)) {
+			echo 8;
+			$vysledek = false;
+		}
+		if (!($this->dpp == $den->dpp)) {
+			echo 9;
+			$vysledek = false;
+		}
+		if (!($this->tyden == $den->tyden)) {
+			echo 10;
+			$vysledek = false;
+		}
+		if (!($this->nazev == $den->nazev)) {
+			echo 11;
+			$vysledek = false;
+		}
+		if (!($this->velky_svatek == $den->velky_svatek)) {
+			echo 12;
+			$vysledek = false;
+		}
+		if (!($this->svati == $den->svati)) {
+			echo "Špatný seznam svatých!<br>";
+			echo print_r(array_diff($den->svati, $this->svati));
+			return false;
+		}
+		return $vysledek;
+	}
+	
 	function nacist_cteni() {
 		// Paschální kruh
 		$denni_cteni_p = $this->rozhrani->dtb->dtb->query("SELECT * FROM {$this->rozhrani->dtb->jmeno_dtb}.denni_cteni_p WHERE den='$this->dpp'");
@@ -533,7 +628,7 @@ class Main {
 		$posun = 13;
 		
 		$rozhrani->dtb_start();
-		$rozhrani->nastav_datum(Datum::vratit_datum());
+		$rozhrani->nastav_datum(Datum::vratit_datum(24, 11, 2019));
 		$rozhrani->nastav_udaje($posun);
 		$rozhrani->den->vypsat();		
 		$rozhrani->dtb->odpojit();
