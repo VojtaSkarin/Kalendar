@@ -191,10 +191,20 @@ class Datum {
 		$this->den_v_tydnu = 0;
 	}
 	
+	function __toString() {
+		return $this->den.". ".$this->mesic.". ".$this->rok;
+	}
+	
 	function nastavit($den, $mesic, $rok) {
 		$this->den = $den;
 		$this->mesic = $mesic;
 		$this->rok = $rok;
+	}
+	
+	function kopirovat($datum) {
+		$this->den = $datum->den;
+		$this->mesic = $datum->mesic;
+		$this->rok = $datum->rok;
 	}
 	
 	function dnesni_datum() {
@@ -204,14 +214,13 @@ class Datum {
 	}
 	
 	function datum_paschy($datum_serveru) {
-		$data = array(2019 => array(28, 4));		
+		$data = array(2019 => Datum::vratit_datum(28, 4, 2019), 2020 => Datum::vratit_datum(19, 4, 2020));
 		
-		$this->nastavit($data[$datum_serveru->rok][0], $data[$datum_serveru->rok][1], $datum_serveru->rok);		
+		$this->kopirovat($data[$datum_serveru->rok]);
 		if (Datum::porovnej($this, $datum_serveru))
 		{
-			$this->nastavit($data[$datum_serveru->rok - 1][0], $data[$datum_serveru->rok - 1][1], $datum_serveru->rok);
+			$this->kopirovat($data[$datum_serveru->rok - 1]);
 		}
-		
 		$this->nastav_den_v_tydnu($datum_serveru);
 	}
 	
@@ -309,6 +318,7 @@ class Den {
 		$this->s_rok = null;
 		$this->s_den = null;
 		$this->s_mesic = null;
+		$this->r_rok = null;
 		$this->hlas = 0;
 		$this->dpp = 0;
 		$this->tyden = 0;
@@ -330,6 +340,8 @@ class Den {
 		$this->n_rok = $this->rozhrani->datum->datum_dne->rok;
 		$this->den_v_tydnu = $this->rozhrani->datum->datum_dne->den_v_tydnu;
 		// Starý styl
+		$this->r_rok = $this->n_rok - 988;
+		
 		$this->s_rok = $this->n_rok + 5508 + (($this->n_mesic > 9 || ($this->n_mesic == 9 && $this->n_den >= 14)) ? 1 : 0);
 		$this->s_den = 0;
 		$this->s_mesic = $this->n_mesic;
@@ -420,6 +432,7 @@ class Den {
 		echo "Nový styl: ", $this->n_den, ". ", $mesic[$this->n_mesic - 1], "<br>";
 		echo $this->s_rok, " let od stvoření světa", "<br>";
 		echo $this->n_rok, " let od narození Krista", "<br>";
+		echo $this->r_rok, " let od pokřtení ruského národa", "<br>";
 		
 		// Týdnování
 		if ($this->tyden == 1 && $this->den_v_tydnu != 7)
@@ -628,9 +641,9 @@ class Main {
 		$posun = 13;
 		
 		$rozhrani->dtb_start();
-		$rozhrani->nastav_datum(Datum::vratit_datum(24, 11, 2019));
+		$rozhrani->nastav_datum(Datum::vratit_datum());
 		$rozhrani->nastav_udaje($posun);
-		$rozhrani->den->vypsat();		
+		$rozhrani->den->vypsat();
 		$rozhrani->dtb->odpojit();
 	}
 }
