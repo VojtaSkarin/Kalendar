@@ -1,6 +1,8 @@
-**/*.*
+# Ignore everything
+*/*
+
+# Unignore self
 !.gitignore
-# Soubory kalendářního kruhu
-!data/kk/[1-12].dat
-# Soubory paschálního kruhu
-!data/pk/[1-99].dat
+
+# Unignore .php files
+!*.php
