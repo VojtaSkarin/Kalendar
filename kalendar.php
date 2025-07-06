@@ -53,6 +53,7 @@ class Date {
 	public $julian_date = array();
 	
 	function __construct() {
+		// Date computation
 		$d = getdate();
 		
 		$this->civil_date["day_id"] = Date::tuple_to_id($d["mon"], $d["mday"]);
@@ -95,16 +96,15 @@ class Date {
 		// Anchor date - 1. 1. 1800 was wednesday
 		$total_years = $date_id["year"] - 1800;
 		
-		$leaps = 0;
+		$total_days = $total_years * 365;
 		
-		for ($year = 1800; $year < $date_id["year"]; $year += 4) {
-			if (Date::is_leap($year)) {
-				$leaps += 1;
-			}
-		}
+		// Leap for current year is contained in day_id
+		$total_years = max(0, $total_years - 1);
+		$leaps = intdiv($total_years, 4) - intdiv($total_years, 100) + intdiv($total_years + 200, 400);
 		
-		$total_days = $total_years * 365 + $leaps + $date_id["day_id"];
+		$total_days += $leaps + $date_id["day_id"];
 		
+		// Fix skipped day in non leap year
 		if (! Date::is_leap($date_id["year"]) && $date_id["day_id"] > 31 + 28) {
 			$total_days -= 1;
 		}
@@ -131,17 +131,77 @@ class Date {
 	function get_readable_julian() {
 		return Date::id_to_tuple($this->julian_date);
 	}
+	
+	function get_id_julian() {
+		return $this->julian_date;
+	}
 }
 
+function read_saints_ohrid($day_id) {		
+	// Saint according to Ohrid Prolog
+	$fp = fopen("saints_ohrid_prolog.csv", "r");
+	
+	$saints = array();
+	
+	while (($line = fgetcsv($fp)) != false) {
+		if ($line[0] == $day_id) {
+			array_push($saints, $line[1]);
+		}
+	}
+	
+	return $saints;
+}
+
+// Date
 $date = new Date;
+
+//$date->civil_date = array("day_id" => 60, "year" => 1800);
 
 echo "<p>" . Date::$day_names[Date::day_in_week($date->get_id_civil())] . "</p>";
 
 echo "<i>day_id: " . $date->civil_date["day_id"] . "</i><br>";
+echo "<i>day_id_old: " . $date->julian_date["day_id"] . "</i><br>";
 
 echo "<p>" . Date::format_date($date->get_readable_civil()) . " podle občanského kalendáře</p>";
 
 echo "<p>" . Date::format_date($date->get_readable_julian()) . " podle pravoslavného kalendáře</p>";
+
+// Saints
+echo "<p>Svatí pro dnešní den podle Ochridského prologu:</p>";
+
+echo "<p>" . implode(", ", read_saints_ohrid($date->get_id_julian()["day_id"])) . "</p>";
+
+echo "<p>Srdečné pozdravy konkurenci z <a href=\"http://www.dcteni.hys.cz\">dcteni.hys.cz</a>, <a href=\"http://www.pravoslavi.cz\">pravoslavi.cz</a> a <a href=\"https://kalendar.or.cz\">kalendar.or.cz</a></p>";
+
+test();
+
+function test() {
+	$date = new Date;
+	
+	// 1. 1. 1800
+	$date->civil_date = array("day_id" => 0, "year" => 1800);
+	assert(Date::day_in_week($date->get_id_civil()) == 0);
+	
+	// 1. 3. 1800
+	$date->civil_date = array("day_id" => 60, "year" => 1800);
+	assert(Date::day_in_week($date->get_id_civil()) == 3);
+	
+	// 1. 1. 1804
+	$date->civil_date = array("day_id" => 0, "year" => 1804);
+	assert(Date::day_in_week($date->get_id_civil()) == 4);
+	
+	// 1. 1. 2000
+	$date->civil_date = array("day_id" => 0, "year" => 2000);
+	assert(Date::day_in_week($date->get_id_civil()) == 3);
+	
+	// 1. 3. 2000
+	$date->civil_date = array("day_id" => 60, "year" => 2000);
+	assert(Date::day_in_week($date->get_id_civil()) == 0);
+	
+	// 1. 1. 2001
+	$date->civil_date = array("day_id" => 0, "year" => 2001);
+	assert(Date::day_in_week($date->get_id_civil()) == 5);
+}
 
 ?>
 
